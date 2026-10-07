@@ -72,6 +72,7 @@ class World {
 
 		this.#mouseHandler = new MouseHandler(
 			this.#uiCamera,
+			this.#renderer.domElement,
 			undefined,
 			(enabled) => {
 				this.#controls.enableZoom = enabled;

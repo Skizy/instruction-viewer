@@ -22,6 +22,7 @@ type MouseHandlerIntersectionWithScrollable = {
 };
 
 class MouseHandler {
+	#canvas: HTMLCanvasElement;
 	#raycaster: THREE.Raycaster;
 	#camera: THREE.Camera;
 	#mousePos: THREE.Vector2;
@@ -44,9 +45,11 @@ class MouseHandler {
 
 	constructor(
 		camera: THREE.Camera,
+		canvas: HTMLCanvasElement,
 		setControlsEnabled?: (enabled: boolean) => void,
 		setControlsEnabledZoom?: (enabled: boolean) => void,
 	) {
+		this.#canvas = canvas;
 		this.#raycaster = new THREE.Raycaster();
 		this.#camera = camera;
 		this.#mousePos = new THREE.Vector2(0, 0);
@@ -68,7 +71,7 @@ class MouseHandler {
 	}
 
 	handleMouseMove(ev: MouseEvent) {
-		const normalized = normalizeMouse(ev.clientX, ev.clientY);
+		const normalized = normalizeMouse(ev.clientX, ev.clientY, this.#canvas);
 		if (!normalized) {
 			return;
 		}
@@ -298,6 +301,8 @@ class MouseHandler {
 	}
 
 	stop() {
+		document.body.style.cursor = "default";
+
 		document.removeEventListener("mousemove", this.#bindedHandleMove);
 		document.removeEventListener("mousedown", this.#bindedHandleDown);
 		document.removeEventListener("wheel", this.#bindedHandleWheel);
@@ -338,14 +343,11 @@ class MouseHandler {
 	}
 }
 
-function normalizeMouse(x: number, y: number): [number, number] | null {
-	const canvas = document.getElementById("main-canvas");
-
-	if (!canvas) {
-		console.error("Couldn't find the main canvas");
-		return null;
-	}
-
+function normalizeMouse(
+	x: number,
+	y: number,
+	canvas: HTMLCanvasElement,
+): [number, number] | null {
 	const newX = (2 * x) / canvas.clientWidth - 1;
 	const newY = (2 * (canvas.clientHeight - y)) / canvas.clientHeight - 1;
 
